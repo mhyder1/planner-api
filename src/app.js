@@ -9,12 +9,16 @@ const eventsRouter = require("./Events/events-router");
 const authRouter = require("./Auth/auth-router");
 const teamsRouter = require("./Teams/teams-router");
 const usersRouter = require("./Users/users-router");
+const teamMembersRouter = require("./TeamMembers/team-members-router");
+const emailsRouter = require("./Emails/email-router");
 
 
 
 
 
 const app = express()
+
+app.use(express.json())
 
 const morganOption = (NODE_ENV === 'production')
     ? 'tiny'
@@ -29,7 +33,9 @@ app.use("/api/events", eventsRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/teams", teamsRouter);
 app.use("/api/users", usersRouter);
-app.use(express.json());
+app.use("/api/team-members", teamMembersRouter);
+app.use("/api/emails", emailsRouter);
+
 
 
 app.get('/api', (req, res) => {

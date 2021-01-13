@@ -2,24 +2,11 @@ const express = require('express')
 const xss = require('xss')
 const logger = require('../logger')
 const EventsService = require('./events-service')
+const {requireAuth} = require("../middleware/jwt-auth")
 
 const eventsRouter = express.Router()
-const bodyParser = express.json()
 
-const events = [
-    {
-        id: 1,
-        description:
-            "Cater wedding. Need two bartenders to set up and run bar station; 10 servers to set up tables and accommodate guests as needed",
-        location: "123 S. Boulevard",
-        date: "2020-12-03",
-        user_id: 1,
-        time_start: "5:00 PM",
-        time_end: "9:00 PM",
-        title: "Johnson Family Wedding",
-        team_id: "1"
-    }
-]
+
 
 const serializeEvent = (event) => {
     return {
@@ -37,7 +24,7 @@ const serializeEvent = (event) => {
 
 eventsRouter
     .route('/')
-    .get((req, res, next) => {
+    .get(requireAuth,(req, res, next) => {
         const knexInstance = req.app.get("db");
         console.log(req.query);
         EventsService.getAllEvents(knexInstance).then((events) => {
@@ -45,7 +32,7 @@ eventsRouter
         })
             .catch(next);
     })
-    .post(bodyParser, (req, res, next) => {
+    .post(requireAuth, (req, res, next) => {
         const {
             time_start,
             time_end,
@@ -97,14 +84,14 @@ eventsRouter
     .get((req, res, next) => {
         res.json(res.event);
     })
-    .delete((req, res, next) => {
+    .delete(requireAuth,(req, res, next) => {
         EventsService.deleteEvent(req.app.get("db"), req.params.id)
             .then((numRowsAffected) => {
                 res.status(204).end();
             })
             .catch(next);
     })
-    .patch((req, res, next) => {
+    .patch(requireAuth,(req, res, next) => {
         const {
             id,
             title,
@@ -139,6 +126,21 @@ eventsRouter
         EventsService.updateEvent(req.app.get("db"), req.params.id, eventToUpdate)
             .then((numRowsAffected) => {
                 res.status(204).end();
+            })
+            .catch(next);
+    });
+ eventsRouter
+    .route("/team-members/events")
+    .get(requireAuth, (req, res, next) => {
+        const user_id = req.user.id;
+        EventsService.getTeamIdByTeamMember(req.app.get("db"), user_id)
+            .then((teamId) => {
+                const team_id = teamId[0].team_id;
+                EventsService.getEventsByTeamId(req.app.get("db"), team_id)
+                    .then((events) => {
+                        res.status(201).json(events);
+                    })
+                    .catch(next);
             })
             .catch(next);
     });
