@@ -39,6 +39,7 @@ usersRouter
             phone_number,
             password,
             confirmPassword,
+            users_type,
         } = req.body;
 
         const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
@@ -49,6 +50,7 @@ usersRouter
             "confirmPassword",
             "first_name",
             "last_name",
+            "user_type"
         ]) {
             if (!req.body[field]) {
                 return res.status(400).json({
