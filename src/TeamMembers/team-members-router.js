@@ -8,7 +8,7 @@ const teamMembersRouter = express.Router();
 
 teamMembersRouter
     .route("/")
-    .get(requireAuth, (req, res, next) => {
+    .get((req, res, next) => {
         const knexInstance = req.app.get("db");
         const creator_id = req.user.id;
         // Gets team_member and user's profile data
@@ -32,11 +32,12 @@ teamMembersRouter
             .catch(next);
     })
     .post(requireAuth, (req, res, next) => {
-        const { team_id, user_id, invite_date } = req.body;
+        const { team_id, user_id, first_name, last_name} = req.body;
         let newTeamMember = {
             team_id,
             user_id,
-            invite_date,
+           first_name,
+           last_name,
         };
         for (const [key, value] of Object.entries(newTeamMember))
             if (value == null) {
@@ -45,7 +46,7 @@ teamMembersRouter
                 });
             }
         const event_id = req.body.event_id;
-        newTeamMember = { team_id, user_id, invite_date, event_id };
+        newTeamMember = { team_id, user_id, first_name, last_name, event_id };
 
         TeamMembersService.insertTeamMember(req.app.get("db"), newTeamMember)
             .then((tmemb) => {
@@ -76,26 +77,26 @@ teamMembersRouter
     })
     .delete(requireAuth, (req, res, next) => {
         TeamMembersService.deleteTeamMember(req.app.get("db"), req.params.user_id)
-            .then((numRowsAffected) => {
+            .then((nupdatedTeamMember) => {
                 res.status(204).end();
             })
             .catch(next);
     })
     .patch((req, res, next) => {
-        const { user_id, accepted } = req.body;
-        const newMember = { user_id, accepted };
+        const { user_id, first_name, last_name, } = req.body;
+        const newMember = { user_id, first_name, last_name};
         const numberOfValues = Object.values(newMember).filter(Boolean).length;
         if (numberOfValues === 0) {
             logger.error(`Invalid update without required fields`);
             return res.status(400).json({
                 error: {
-                    message: `Request body must contain both 'user_id' and 'accepted'`,
+                    message: `Request body must contain both 'user_id', 'first_name' and 'last_name'`,
                 },
             });
         }
 
-        TeamMembersService.updateAccepted(req.app.get("db"), user_id, accepted)
-            .then((numRowsAffected) => {
+        TeamMembersService.updateTeamMember(req.app.get("db"), user_id, first_name, last_name)
+            .then((nupdatedTeamMember) => {
                 res.status(204).json("PATCH a success");
             })
             .catch(next);

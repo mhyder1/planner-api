@@ -3,6 +3,7 @@ const xss = require('xss')
 const logger = require('../logger')
 const EventsService = require('./events-service')
 const {requireAuth} = require("../middleware/jwt-auth")
+const { updateEvent } = require('./events-service')
 
 const eventsRouter = express.Router()
 
@@ -24,7 +25,7 @@ const serializeEvent = (event) => {
 
 eventsRouter
     .route('/')
-    .get(requireAuth,(req, res, next) => {
+    .get((req, res, next) => {
         const knexInstance = req.app.get("db");
         console.log(req.query);
         EventsService.getAllEvents(knexInstance).then((events) => {
@@ -86,7 +87,7 @@ eventsRouter
     })
     .delete(requireAuth,(req, res, next) => {
         EventsService.deleteEvent(req.app.get("db"), req.params.id)
-            .then((numRowsAffected) => {
+            .then(() => {
                 res.status(204).end();
             })
             .catch(next);
@@ -124,14 +125,14 @@ eventsRouter
         }
 
         EventsService.updateEvent(req.app.get("db"), req.params.id, eventToUpdate)
-            .then((numRowsAffected) => {
-                res.status(204).end();
+            .then((updatedEvent) => {
+                res.json(updateEvent)
             })
             .catch(next);
     });
  eventsRouter
     .route("/team-members/events")
-    .get(requireAuth, (req, res, next) => {
+    .get((req, res, next) => {
         const user_id = req.user.id;
         EventsService.getTeamIdByTeamMember(req.app.get("db"), user_id)
             .then((teamId) => {

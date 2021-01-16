@@ -9,7 +9,7 @@ const teamsRouter = express.Router();
 
 teamsRouter
     .route("/")
-    .get(requireAuth,(req, res, next) => {
+    .get((req, res, next) => {
         const knexInstance = req.app.get("db");
         TeamsService.getAllTeams(knexInstance)
             .then((teams) => {
@@ -56,7 +56,7 @@ teamsRouter
     })
     .delete((req, res, next) => {
         TeamsService.deleteTeam(req.app.get("db"), req.params.id)
-            .then((numRowsAffected) => {
+            .then((updateTeam) => {
                 res.status(204).end();
             })
             .catch(next);
@@ -76,7 +76,7 @@ teamsRouter
         }
 
         TeamsService.updateTeam(req.app.get("db"), req.params.id, teamToUpdate)
-            .then((numRowsAffected) => {
+            .then((updateTeam) => {
                 res.status(204).end();
             })
             .catch(next);

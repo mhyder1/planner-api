@@ -1,7 +1,8 @@
 BEGIN;
 
-INSERT INTO teams (id, creator_id, title)
+INSERT INTO teams ( title)
 VALUES
-(1, 1, 'Demo Team');
+( 'Demo Team'),
+('Demo Team2');
 
 COMMIT;

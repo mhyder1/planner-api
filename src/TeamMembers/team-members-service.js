@@ -12,8 +12,8 @@ const TeamMembersService = {
             .select("*")
             .from("team_members")
             .where("team_id", team_id)
-            .andWhere("accepted", true)
-            .whereNull("event_id");
+            .andWhere("first_name")
+            .whereNull("last_name");
     },
 
     getUsersByTeamMemberId(knex, id) {
@@ -34,10 +34,10 @@ const TeamMembersService = {
         return knex.from("team_members").select("*").where("user_id", user_id);
     },
 
-    updateAccepted(knex, user_id, accepted) {
+    updateTeamMember(knex, user_id, first_name) {
         return knex("team_members")
             .where("user_id", user_id)
-            .update("accepted", accepted);
+            .update("first_name", first_name);
     },
 
     deleteTeamMember(knex, user_id) {
