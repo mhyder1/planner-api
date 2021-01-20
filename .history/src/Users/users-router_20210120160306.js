@@ -30,6 +30,7 @@ usersRouter
         });
     })
     .post((req, res) => {
+        console.log('Posting...')
         const {
             email,
             first_name,

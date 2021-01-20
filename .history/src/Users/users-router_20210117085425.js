@@ -38,6 +38,7 @@ usersRouter
             profile_image,
             phone_number,
             password,
+            confirmPassword,
             users_type,
         } = req.body;
 
@@ -46,6 +47,7 @@ usersRouter
         for (const field of [
             "email",
             "password",
+            "confirmPassword",
             "first_name",
             "last_name",
             "user_type"
@@ -57,11 +59,11 @@ usersRouter
             }
         }
 
-        // if (password !== confirmPassword) {
-        //     return res.status(400).json({
-        //         error: `Passwords don't match`,
-        //     });
-        // }
+        if (password !== confirmPassword) {
+            return res.status(400).json({
+                error: `Passwords don't match`,
+            });
+        }
 
         if (password.length < 8) {
             return res.status(400).json({
