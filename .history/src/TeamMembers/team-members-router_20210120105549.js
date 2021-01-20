@@ -47,7 +47,7 @@ teamMembersRouter
                 });
             }
         // const event_id = req.body.event_id;
-        newTeamMember = { team_id, user_id, first_name, last_name, phone_number };
+        newTeamMember = { team_id, user_id, first_name, last_name };
 
         TeamMembersService.insertTeamMember(req.app.get("db"), newTeamMember)
             .then((tmemb) => {

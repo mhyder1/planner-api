@@ -12,8 +12,8 @@ const TeamMembersService = {
             .select("*")
             .from("team_members")
             .where("team_id", team_id)
-            // .andWhere("first_name")
-            // .whereNull("last_name");
+            .andWhere("first_name")
+            .whereNull("last_name");
     },
 
     getUsersByTeamMemberId(knex, id) {

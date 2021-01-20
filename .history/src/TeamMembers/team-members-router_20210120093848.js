@@ -32,13 +32,12 @@ teamMembersRouter
             .catch(next);
     })
     .post(requireAuth, (req, res, next) => {
-        const { team_id, user_id, first_name, last_name, phone_number} = req.body;
+        const { team_id, user_id, first_name, last_name} = req.body;
         let newTeamMember = {
             team_id,
             user_id,
            first_name,
            last_name,
-           phone_number
         };
         for (const [key, value] of Object.entries(newTeamMember))
             if (value == null) {
@@ -47,7 +46,7 @@ teamMembersRouter
                 });
             }
         // const event_id = req.body.event_id;
-        newTeamMember = { team_id, user_id, first_name, last_name, phone_number };
+        newTeamMember = { team_id, user_id, first_name, last_name };
 
         TeamMembersService.insertTeamMember(req.app.get("db"), newTeamMember)
             .then((tmemb) => {
@@ -56,28 +55,28 @@ teamMembersRouter
             .catch(next);
     });
 teamMembersRouter
-    .route("/:user_id")
-    .all((req, res, next) => {
-        // const creator_id = user_id;
-        TeamMembersService.getTeamMemberByUserId(
-            req.app.get("db"),
-            req.params.user_id
-        )
-            .then((members) => {
-                if (!members) {
-                    return res.status(400).json({
-                        error: { message: `Member doesn't exist` },
-                    });
-                }
-                res.members = members;
-                next();
-            })
-            .catch(next);
-    })
-    .get((req, res, next) => {
-        console.log(res.members)
-        res.json(res.members);
-    })
+.route("/:user_id")
+.all((req, res, next) => {
+    const creator_id = user_id;
+    TeamMembersService.getTeamMemberByUserId(
+        req.app.get("db"),
+        req.params.user_id
+    )
+        .then((user) => {
+            if (!user) {
+                return res.status(400).json({
+                    error: { message: `User doesn't exist` },
+                });
+            }
+            res.user = user;
+            next();
+        })
+        .catch(next);
+})
+.get((req, res, next) => {
+    
+    res.json(res.user);
+})
     .delete(requireAuth, (req, res, next) => {
         TeamMembersService.deleteTeamMember(req.app.get("db"), req.params.user_id)
             .then((nupdatedTeamMember) => {
